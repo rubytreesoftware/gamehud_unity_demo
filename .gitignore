@@ -1,0 +1,5 @@
+obj/*
+Temp/*
+Assembly-CSharp.csproj.user
+Assembly-CSharp-vs.csproj.user
+*.suo
