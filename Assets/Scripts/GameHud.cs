@@ -183,9 +183,9 @@ public class GameHud : MonoBehaviour
     {
         var form = new WWWForm();
 
-        form.AddField("game_session[id]", GameSessionId);
+        form.AddField("_method", "put");
 
-        StartCoroutine(Send("game_sessions", form, null));
+        StartCoroutine(Send("game_sessions/" + GameSessionId, form, null));
     }
 
     private void SendEventQueue()
