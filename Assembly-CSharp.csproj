@@ -44,14 +44,14 @@
 	</Reference>
   </ItemGroup>
   <ItemGroup>
+     <Compile Include="Assets\GAMEhud\GameHud.cs" />
+     <Compile Include="Assets\GAMEhud\GameHudEvent.cs" />
+     <Compile Include="Assets\GAMEhud\GameHudEventQueue.cs" />
      <Compile Include="Assets\Scripts\Enemy.cs" />
-     <Compile Include="Assets\Scripts\GameHud.cs" />
-     <Compile Include="Assets\Scripts\GameHudEvent.cs" />
-     <Compile Include="Assets\Scripts\GameHudEventQueue.cs" />
      <Compile Include="Assets\Scripts\Player.cs" />
      <Compile Include="Assets\Scripts\Projectile.cs" />
  <Reference Include="JsonFx.Json">
- <HintPath>Assets\Scripts\JsonFx\JsonFx.Json.dll</HintPath>
+ <HintPath>Assets\GAMEhud\JsonFx\JsonFx.Json.dll</HintPath>
  </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
