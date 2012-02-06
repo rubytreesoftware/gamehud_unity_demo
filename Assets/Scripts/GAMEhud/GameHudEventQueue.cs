@@ -65,6 +65,7 @@ public sealed class GameHudEventQueue
     /// </summary>
     /// <param name="type">The event type.</param>
     /// <param name="message">The message.</param>
+    /// <param name="callStack">The call stack.</param>
     public static void Log(string type, string message, string callStack)
     {
         Log(type, message, 0, 0, 0, callStack);
@@ -75,6 +76,9 @@ public sealed class GameHudEventQueue
     /// </summary>
     /// <param name="type">The event type.</param>
     /// <param name="message">The message.</param>
+    /// <param name="xPosition">The x position.</param>
+    /// <param name="yPosition">The y position.</param>
+    /// <param name="zPosition">The z position.</param>
     public static void Log(string type, string message, float xPosition, float yPosition, float zPosition)
     {
         Log(type, message, xPosition, yPosition, zPosition, "");
