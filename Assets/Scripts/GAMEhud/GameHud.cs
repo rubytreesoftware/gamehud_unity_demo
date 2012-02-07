@@ -61,7 +61,7 @@ public class GameHud : MonoBehaviour
 	/// <summary>
 	/// Stores the version of your game to send to GAMEhud.  This is optional, but encouraged.
 	/// </summary>
-    public static string Version { get; private set; }
+    public static string Version { get; set; }
 
     #region Unity Callbacks
 
@@ -72,7 +72,7 @@ public class GameHud : MonoBehaviour
 
         if (gameId == 0 || String.IsNullOrEmpty(gameApiKey))
         {
-            Debug.LogError("GameHUD not configured.  Please set your game_id and game_api_key that you received from GameHUD on the GameHUD object.");
+            Debug.LogError("GAMEhud not configured.  Please set your game_id and game_api_key that you received from GAMEhud on the GAMEhud object.");
             return;
         }
 
@@ -81,11 +81,6 @@ public class GameHud : MonoBehaviour
 
     void Start()
     {
-        // Values to be removed, inserted for testing //
-        Version = "1.0";
-        PlayerPrefs.DeleteKey(machinePrefsKey);
-        //////////////////////////////////////////////////
-
         if (PlayerPrefs.HasKey(machinePrefsKey))
         {
             MachineId = PlayerPrefs.GetInt(machinePrefsKey);
@@ -110,8 +105,6 @@ public class GameHud : MonoBehaviour
         SendEventQueue();
         CloseSession();
     }
-
-    //OnApplicationPause
 
     #endregion
 
@@ -210,7 +203,6 @@ public class GameHud : MonoBehaviour
 
     IEnumerator Send(string method, WWWForm form, Action callBack) //Func<string, int>
     {
-        //Debug.Log("Sending");
         if (Application.internetReachability == NetworkReachability.NotReachable)
             yield break;
 
@@ -231,7 +223,6 @@ public class GameHud : MonoBehaviour
         }
         else if (int.TryParse(www.text, out tempId))
         {
-            //Debug.Log("Parsing response");
             if (method == "machines")
             {
                 MachineId = tempId;

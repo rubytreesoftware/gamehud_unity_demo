@@ -46,6 +46,12 @@ public class Player : MonoBehaviour
     private float screenLeftLimit = -7.0f;
     private float screenRightLimit = 7.0f;
 
+    void Awake()
+    {
+        GameHud.Version = DemoGame.VERSION;
+        Debug.Log("Version: " + GameHud.Version);
+    }
+
     void Start()
     {
         myTransform = transform;
