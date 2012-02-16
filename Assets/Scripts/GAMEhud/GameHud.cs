@@ -207,7 +207,7 @@ public class GameHud : MonoBehaviour
             yield break;
 
         int tempId;
-        var url = "http://mygamehud.herokuapp.com/api/v1/";
+        var url = "http://www.mygamehud.com/api/v1/";
         url += method;
 
         form.AddField("game_id", gameId);
