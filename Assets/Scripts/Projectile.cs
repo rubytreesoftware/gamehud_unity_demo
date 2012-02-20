@@ -44,11 +44,61 @@ public class Projectile : MonoBehaviour
             Debug.Log(Player.Score.ToString());
             Debug.Log(Player.Lives.ToString());
             Player.Score += 100;
+            SetPlayerRank();
 
             //Destroy the projectile
             Destroy(gameObject);
 
             Debug.Log("Player destroyed the enemy!  Now the score is " + Player.Score.ToString());
         }
+    }
+
+    private void SetPlayerRank()
+    {
+        bool rankChanged = false;
+
+        if (Player.Score == 3500)
+        {
+            Player.CurrentRank = "08 - Fleet Admiral";
+            rankChanged = true;
+        }
+        else if (Player.Score == 3000)
+        {
+            Player.CurrentRank = "07 - Admiral";
+            rankChanged = true;
+        }
+        else if (Player.Score == 2500)
+        {
+            Player.CurrentRank = "06 - Captain";
+            rankChanged = true;
+        }
+        else if (Player.Score == 2000)
+        {
+            Player.CurrentRank = "05 - Commander";
+            rankChanged = true;
+        }
+        else if (Player.Score == 1500)
+        {
+            Player.CurrentRank = "04 - Lt. Commander";
+            rankChanged = true;
+        }
+        else if (Player.Score == 1000)
+        {
+            Player.CurrentRank = "03 - Lieutenant";
+            rankChanged = true;
+        }
+        else if (Player.Score == 500)
+        {
+            Player.CurrentRank = "02 - Lt. Junior Grade";
+            rankChanged = true;
+        }
+        else if (Player.Score == 0)
+        {
+            Player.CurrentRank = "01 - Ensign";
+            rankChanged = true;
+        }
+
+        if (rankChanged)
+            GameHudEventQueue.Log("Rank Earned", Player.CurrentRank);
     }
 }

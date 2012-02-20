@@ -29,6 +29,8 @@ public class Player : MonoBehaviour
     /// </summary>
     public static int Lives = 3;
 
+    public static string CurrentRank = "01 - Ensign";
+
     enum State
     {
         Playing,
@@ -84,6 +86,7 @@ public class Player : MonoBehaviour
     {
         GUI.Label(new Rect(10, 10, 100, 20), "Score: " + Player.Score.ToString());
         GUI.Label(new Rect(10, 40, 100, 20), "Lives: " + Player.Lives.ToString());
+        GUI.Label(new Rect(10, 70, 200, 20), "Rank: " + Player.CurrentRank);
     }
 
     void OnTriggerEnter(Collider otherObject)
@@ -101,6 +104,8 @@ public class Player : MonoBehaviour
     IEnumerator DestroyShip()
     {
         Debug.Log("Player died!  Maybe they should move faster!");
+        GameHudEventQueue.Log("Death Rank", "Player died. Rank: " + Player.CurrentRank);
+        GameHudEventQueue.Log("Death Score", "Player died. Score: " + Player.Score);
         Lives--;
         state = State.Exploding;
         renderer.enabled = false;
