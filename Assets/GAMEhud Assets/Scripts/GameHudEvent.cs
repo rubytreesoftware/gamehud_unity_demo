@@ -12,5 +12,6 @@ public struct GameHudEvent
 	public float xPosition;
 	public float yPosition;
 	public float zPosition;
-	public string call_stack;	
+	public string call_stack;
+	public string recorded_at;
 }

@@ -39,8 +39,8 @@ public class Enemy : MonoBehaviour {
     public void SetStartingPositionAndSpeed()
     {
             //Using Random.Range here (instead of Random.RandomRange) as suggested causes jerkiness when the game is running.
-            currentSpeed = Random.RandomRange(MinSpeed, MaxSpeed);
-            x = Random.RandomRange(-5.5f, 5.5f);
+            currentSpeed = Random.Range(MinSpeed, MaxSpeed);
+            x = Random.Range(-5.5f, 5.5f);
             y = 7.0f;
             z = 0.0f;
             myTransform.position = new Vector3(x, y, z);

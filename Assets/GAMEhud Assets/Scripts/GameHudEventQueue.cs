@@ -119,7 +119,8 @@ public sealed class GameHudEventQueue
             xPosition = xPosition,
             yPosition = yPosition,
             zPosition = zPosition,
-            call_stack = callStack
+            call_stack = callStack,
+			recorded_at = System.DateTime.Now.ToString("O")
         });
 
     }

@@ -81,6 +81,7 @@ public class GameHud : MonoBehaviour
 
     void Start()
     {
+		//PlayerPrefs.DeleteKey(machinePrefsKey);  // Only used by the GAMEhud team 
         if (PlayerPrefs.HasKey(machinePrefsKey))
         {
             MachineId = PlayerPrefs.GetInt(machinePrefsKey);
@@ -88,9 +89,6 @@ public class GameHud : MonoBehaviour
         }
         else
             RegisterMachine();
-
-        Debug.LogError("Log test 1");
-        Debug.LogWarning("Log test 2");
 
         StartCoroutine(StartSendEventLoop());
     }
@@ -189,7 +187,8 @@ public class GameHud : MonoBehaviour
         }
 
         var form = new WWWForm();
-
+		
+		form.AddField("submitted_at", DateTime.Now.ToString("O"));
         if (GameSessionId != 0)
             form.AddField("game_session_id", GameSessionId);
 

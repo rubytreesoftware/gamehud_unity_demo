@@ -1,1 +1,4 @@
+0.2 - Added the ability to submit DateTimes with game events.
+
 0.1 - Initial Version
+
