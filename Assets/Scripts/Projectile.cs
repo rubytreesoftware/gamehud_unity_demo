@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 /// <summary>
 /// This class handles the behavior for the projectiles.
@@ -41,15 +42,15 @@ public class Projectile : MonoBehaviour
             Enemy enemy = (Enemy)otherObject.GetComponent("Enemy");
             enemy.SetStartingPositionAndSpeed();
 
-            Debug.Log(Player.Score.ToString());
-            Debug.Log(Player.Lives.ToString());
+            //Debug.Log(Player.Score.ToString());
+            //Debug.Log(Player.Lives.ToString());
             Player.Score += 100;
             SetPlayerRank();
 
             //Destroy the projectile
             Destroy(gameObject);
 
-            Debug.Log("Player destroyed the enemy!  Now the score is " + Player.Score.ToString());
+            //Debug.Log("Player destroyed the enemy!  Now the score is " + Player.Score.ToString());
         }
     }
 
@@ -99,6 +100,10 @@ public class Projectile : MonoBehaviour
         }
 
         if (rankChanged)
-            GameHudEventQueue.Log("Rank Earned", Player.CurrentRank);
+		{
+			Dictionary<string, string> propertyList = new Dictionary<string, string>();
+			propertyList.Add("Rank", Player.CurrentRank);
+			GameHudEventQueue.Log("Rank Earned", propertyList);
+		}
     }
 }

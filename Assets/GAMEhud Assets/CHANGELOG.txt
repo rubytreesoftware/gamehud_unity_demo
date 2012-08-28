@@ -1,3 +1,7 @@
+2.0 - Updated the wrapper to work with Version 2 of the GameHud API.
+
+1.2 - Revised how versioning works.  Major release 1.X corresponds to the API version.  Minor release X.2 refers to a wrapper improvement.
+
 0.2 - Added the ability to submit DateTimes with game events.
 
 0.1 - Initial Version

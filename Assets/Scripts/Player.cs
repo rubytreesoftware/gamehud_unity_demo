@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 /// <summary>
 /// This class handles the behavior of the player object.  It's also responsible for painting the screen GUI.
@@ -51,7 +52,6 @@ public class Player : MonoBehaviour
     void Awake()
     {
         GameHud.Version = DemoGame.VERSION;
-        Debug.Log("Version: " + GameHud.Version);
     }
 
     void Start()
@@ -102,10 +102,12 @@ public class Player : MonoBehaviour
     }
 
     IEnumerator DestroyShip()
-    {
-        Debug.Log("Player died!  Maybe they should move faster!");
-        GameHudEventQueue.Log("Death Rank", "Player died. Rank: " + Player.CurrentRank);
-        GameHudEventQueue.Log("Death Score", "Player died. Score: " + Player.Score);
+    {		
+		Dictionary<string, string> propertyList = new Dictionary<string, string>();
+		propertyList.Add("Rank", Player.CurrentRank);
+		propertyList.Add("Score", Player.Score.ToString());
+		GameHudEventQueue.Log("Player died", propertyList);
+		
         Lives--;
         state = State.Exploding;
         renderer.enabled = false;
@@ -113,8 +115,7 @@ public class Player : MonoBehaviour
         Instantiate(ExplosionPrefab, position, Quaternion.identity);
         if (Lives < 0)
         {
-            Debug.Log("Lost the game");
-            GameHudEventQueue.Log("Score", Player.Score.ToString());
+			GameHudEventQueue.Log("Game Over", propertyList);
             yield return new WaitForSeconds(1.0f);
             Application.LoadLevel("GameOver");
         }
@@ -137,6 +138,6 @@ public class Player : MonoBehaviour
         }
         blinkCount = 0;
         state = State.Playing;
-        Debug.LogError("This is a pretend error...nothing bad really happened!  We just want to test logging errors to GAMEhud");
+        Debug.LogError("Pretend Error: View the details in GameHud.");
     }
 }

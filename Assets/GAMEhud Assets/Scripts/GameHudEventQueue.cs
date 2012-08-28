@@ -31,98 +31,64 @@ public sealed class GameHudEventQueue
 	/// </param>
     public static void UnityLog(string message, string stackTrace, LogType logType)
     {
-        string type;
+        string logName;
 
         if (logType == LogType.Log && GameHud.Instance.sendUnityLogInfo)
-            type = "Log";
+            logName = "Log";
         else if (logType == LogType.Warning && GameHud.Instance.sendUnityLogWarnings)
-            type = "Warning";
+            logName = "Warning";
         else if (logType == LogType.Error && GameHud.Instance.sendUnityLogErrors)
-            type = "Error";
+            logName = "Error";
         else if (logType == LogType.Exception && GameHud.Instance.sendUnityLogExceptions)
-            type = "Exception";
+            logName = "Exception";
         else
             return;
 
         if (!string.IsNullOrEmpty(message) && message.StartsWith("GameHUD"))
             return;
 
-        Log(type, message, 0, 0, 0, stackTrace);
+        Log(message, logName, stackTrace, null);
     }
 
     /// <summary>
     /// Captures custom events to be sent to GAMEhud.
     /// </summary>
-    /// <param name="type">The event type.</param>
-    /// <param name="message">The message.</param>
-    public static void Log(string type, string message)
+    /// <param name="name">The event name.</param>
+	/// <param name="eventProperties">Event properties dictionary </param>
+    public static void Log(string name, Dictionary<string, string> eventProperties)
     {
-        Log(type, message, 0, 0, 0, "");
-    }
-
+        Log(name, "", "", eventProperties);
+    }	
+	
     /// <summary>
     /// Captures custom events to be sent to GAMEhud.
     /// </summary>
-    /// <param name="type">The event type.</param>
-    /// <param name="message">The message.</param>
-    /// <param name="callStack">The call stack.</param>
-    public static void Log(string type, string message, string callStack)
+    /// <param name="name">The event name.</param>
+    public static void Log(string name)
     {
-        Log(type, message, 0, 0, 0, callStack);
+        Log(name, "", "", null);
     }
 
-    /// <summary>
-    /// Captures custom events to be sent to GAMEhud.
-    /// </summary>
-    /// <param name="type">The event type.</param>
-    /// <param name="message">The message.</param>
-    /// <param name="xPosition">The x position.</param>
-    /// <param name="yPosition">The y position.</param>
-    /// <param name="zPosition">The z position.</param>
-    public static void Log(string type, string message, float xPosition, float yPosition, float zPosition)
-    {
-        Log(type, message, xPosition, yPosition, zPosition, "");
-    }
-
-    /// <summary>
-    /// Captures custom events to be sent to GAMEhud.
-    /// </summary>
-    /// <param name="type">The type.</param>
-    /// <param name="message">The message.</param>
-    /// <param name="xPosition">The x position.</param>
-    /// <param name="yPosition">The y position.</param>
-    /// <param name="zPosition">The z position.</param>
-    /// <param name="callStack">The call stack.</param>
-    public static void Log(string type, string message, float xPosition, float yPosition, float zPosition, string callStack)
+/// <summary>
+/// Captures custom events to be sent to GAMEhud.
+/// </summary>
+/// <param name="name">Event Name</param>
+/// <param name="logType">Unity Log type.</param>
+/// <param name="stackTrace">Unity Stack trace.</param>
+/// <param name="eventProperties">Event properties dictionary </param>
+    public static void Log(string name, string logType, string stackTrace, Dictionary<string, string> eventProperties)
     {
         if (Application.isEditor && !GameHud.Instance.sendUnityEditorLogs)
             return;
 
-        for (int i = 0; i < Events.Count; i++)
-        {
-            var eventLog = Events[i];
-
-            if (eventLog.type == type && eventLog.message == message && eventLog.call_stack == callStack)
-            {
-                eventLog.counter++;
-                Events[i] = eventLog;
-                return;
-            }
-        }
-
         Events.Add(new GameHudEvent
         {
-            counter = 1,
-            type = type,
-            message = message,
-            level = Application.loadedLevelName,
-            xPosition = xPosition,
-            yPosition = yPosition,
-            zPosition = zPosition,
-            call_stack = callStack,
-			recorded_at = System.DateTime.Now.ToString("O")
+			_Name = name,
+			_RecordedAt = System.DateTime.Now.ToString("O"),
+			_StackTrace = stackTrace,
+			_Level = Application.loadedLevelName,
+			_LogType = logType,
+			_EventProperties = eventProperties
         });
-
     }
-
 }

@@ -55,9 +55,6 @@
      <None Include="Assets\GAMEhud Assets\VERSION.txt" />
      <None Include="Assets\GAMEhud Assets\LICENSE.txt" />
      <None Include="Assets\GAMEhud Assets\README.txt" />
- <Reference Include="JsonFx.Json">
- <HintPath>Assets\GAMEhud Assets\Scripts\JsonFx\JsonFx.Json.dll</HintPath>
- </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

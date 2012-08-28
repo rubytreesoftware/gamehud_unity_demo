@@ -2,7 +2,6 @@ using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using JsonFx.Json;
 
 /// <summary>
 /// The base class for implementing the GAMEhud API interface in Unity.
@@ -10,11 +9,7 @@ using JsonFx.Json;
 public class GameHud : MonoBehaviour
 {
     /// <summary>
-    /// Unique identifier of the GameHUD game.  This id is supplied to you when you register the game on the GAMEhud site. 
-    /// </summary>
-    public int gameId;
-	/// <summary>
-	/// Secret Key used in conjunction with the gameID to authenticate your communicate with the GAMEhud API. 
+    /// Unique identifier of the GameHUD game.  This key is supplied to you when you register the game on the GAMEhud site.  
 	/// </summary>
     public string gameApiKey;
 	/// <summary>
@@ -40,10 +35,9 @@ public class GameHud : MonoBehaviour
 	/// <summary>
 	/// Determines how frequently to send game events to GAMEhud.  Enter the time in seconds.
 	/// </summary>
-    public int sendEventDelay = 5;
+    public int sendEventDelay = 30;
 
-    private string machinePrefsKey = "gamehud_machine_id_";
-    private int eventsSent;
+    private string devicePrefsKey = "gamehud_device_id_";
     private bool sendEvents = true;
 	
 	/// <summary>
@@ -51,13 +45,13 @@ public class GameHud : MonoBehaviour
 	/// </summary>
     public static GameHud Instance;
 	/// <summary>
-	/// Unique identifier for this machine.  The id is obtained from the gameHUD service. 
+	/// Unique identifier for this device.
 	/// </summary>
-    public static int MachineId { get; private set; }
+    public static string DeviceIdentifier { get; private set; }
 	/// <summary>
-	/// Unique identifier for each Unity game session.  This id is obtained from the GAMEhud service.
+	/// Unique identifier for each Unity game session.
 	/// </summary>
-    public static int GameSessionId { get; private set; }
+    public static string GameSessionIdentifier { get; private set; }
 	/// <summary>
 	/// Stores the version of your game to send to GAMEhud.  This is optional, but encouraged.
 	/// </summary>
@@ -70,9 +64,9 @@ public class GameHud : MonoBehaviour
         Instance = this;
         DontDestroyOnLoad(this);
 
-        if (gameId == 0 || String.IsNullOrEmpty(gameApiKey))
+        if (String.IsNullOrEmpty(gameApiKey))
         {
-            Debug.LogError("GAMEhud not configured.  Please set your game_id and game_api_key that you received from GAMEhud on the GAMEhud object.");
+            Debug.LogError("GAMEhud not configured.  Please set your game_api_key that you received from GAMEhud on the GAMEhud object.");
             return;
         }
 
@@ -81,15 +75,19 @@ public class GameHud : MonoBehaviour
 
     void Start()
     {
-		//PlayerPrefs.DeleteKey(machinePrefsKey);  // Only used by the GAMEhud team 
-        if (PlayerPrefs.HasKey(machinePrefsKey))
+		//PlayerPrefs.DeleteKey(devicePrefsKey);  // Only used by the GAMEhud team 
+        if (PlayerPrefs.HasKey(devicePrefsKey))
         {
-            MachineId = PlayerPrefs.GetInt(machinePrefsKey);
-            RegisterSession();
+            DeviceIdentifier = PlayerPrefs.GetString(devicePrefsKey);
         }
         else
-            RegisterMachine();
-
+		{
+			DeviceIdentifier = System.Guid.NewGuid().ToString();
+			PlayerPrefs.SetString(devicePrefsKey, DeviceIdentifier);
+		}
+        
+		GameSessionIdentifier = System.Guid.NewGuid().ToString();
+		SendDeviceInfo();
         StartCoroutine(StartSendEventLoop());
     }
 
@@ -101,7 +99,6 @@ public class GameHud : MonoBehaviour
     void OnApplicationQuit()
     {
         SendEventQueue();
-        CloseSession();
     }
 
     #endregion
@@ -112,7 +109,7 @@ public class GameHud : MonoBehaviour
         {
             yield return new WaitForSeconds((float)sendEventDelay);
 
-            Debug.LogWarning("Timer Loop");
+            //Debug.LogWarning("Timer Loop");
 
             if (sendEvents)
                 SendEventQueue();
@@ -129,54 +126,28 @@ public class GameHud : MonoBehaviour
         sendEvents = true;
     }
 
-    private void RegisterMachine()
+    private void SendDeviceInfo()
     {
-        var form = new WWWForm();
-
-#if !UNITY_IPHONE
-        if (Application.platform != RuntimePlatform.IPhonePlayer)
-        {
-            form.AddField("machine[operating_system]", SystemInfo.operatingSystem);
-            form.AddField("machine[processor_type]", SystemInfo.processorType);
-            form.AddField("machine[processor_count]", SystemInfo.processorCount);
-            form.AddField("machine[system_memory_size]", SystemInfo.systemMemorySize);
-            form.AddField("machine[graphics_memory_size]", SystemInfo.graphicsMemorySize);
-            form.AddField("machine[graphics_device_name]", SystemInfo.graphicsDeviceName);
-            form.AddField("machine[graphics_device_vendor]", SystemInfo.graphicsDeviceVendor);
-            form.AddField("machine[graphics_device_id]", SystemInfo.graphicsDeviceID);
-            form.AddField("machine[graphics_device_vendor_id]", SystemInfo.graphicsDeviceVendorID);
-            form.AddField("machine[graphics_device_version]", SystemInfo.graphicsDeviceVersion);
-            form.AddField("machine[graphics_shader_level_id]", SystemInfo.graphicsShaderLevel);
-            form.AddField("machine[graphics_pixel_fillrate]", SystemInfo.graphicsPixelFillrate);
-            form.AddField("machine[supports_shadows]", SystemInfo.supportsShadows ? 1 : 0);
-            form.AddField("machine[supports_render_textures]", SystemInfo.supportsRenderTextures ? 1 : 0);
-            form.AddField("machine[supports_image_effects]", SystemInfo.supportsImageEffects ? 1 : 0);
-            form.AddField("machine[system_language]", Application.systemLanguage.ToString());
-        }
-#endif
-
-        StartCoroutine(Send("machines", form, RegisterSession));
-    }
-
-    private void RegisterSession()
-    {
-        var form = new WWWForm();
-
-        if (MachineId != 0)
-            form.AddField("game_session[machine_id]", MachineId);
-        if (Version != null)
-            form.AddField("game_session[version]", Version);
-
-        StartCoroutine(Send("game_sessions", form, null));
-    }
-
-    private void CloseSession()
-    {
-        var form = new WWWForm();
-
-        form.AddField("_method", "put");
-
-        StartCoroutine(Send("game_sessions/" + GameSessionId, form, null));
+	    var form = new WWWForm();
+		
+        form.AddField("operating_system", SystemInfo.operatingSystem);
+        form.AddField("processor_type", SystemInfo.processorType);
+        form.AddField("processor_count", SystemInfo.processorCount);
+        form.AddField("system_memory_size", SystemInfo.systemMemorySize);
+        form.AddField("graphics_memory_size", SystemInfo.graphicsMemorySize);
+        form.AddField("graphics_device_name", SystemInfo.graphicsDeviceName);
+        form.AddField("graphics_device_vendor", SystemInfo.graphicsDeviceVendor);
+        form.AddField("graphics_device_id", SystemInfo.graphicsDeviceID);
+        form.AddField("graphics_device_vendor_id", SystemInfo.graphicsDeviceVendorID);
+        form.AddField("graphics_device_version", SystemInfo.graphicsDeviceVersion);
+        form.AddField("graphics_shader_level_id", SystemInfo.graphicsShaderLevel);
+        form.AddField("graphics_pixel_fillrate", SystemInfo.graphicsPixelFillrate);
+        form.AddField("supports_shadows", SystemInfo.supportsShadows ? "True" : "False");
+        form.AddField("supports_render_textures", SystemInfo.supportsRenderTextures ? "True" : "False");
+        form.AddField("supports_image_effects", SystemInfo.supportsImageEffects ? "True" : "False");
+        form.AddField("system_language", Application.systemLanguage.ToString());
+	
+	    StartCoroutine(Send("devices", form, new GameHudEvent()));//, RegisterSession));
     }
 
     private void SendEventQueue()
@@ -185,65 +156,62 @@ public class GameHud : MonoBehaviour
         {
             return;
         }
-
-        var form = new WWWForm();
 		
-		form.AddField("submitted_at", DateTime.Now.ToString("O"));
-        if (GameSessionId != 0)
-            form.AddField("game_session_id", GameSessionId);
-
-        var json = JsonWriter.Serialize(GameHudEventQueue.Events);
-        eventsSent = GameHudEventQueue.Events.Count;
-
-        form.AddField("game_events", json);
-
-        StartCoroutine(Send("game_events", form, null));
+		for (int i = 0; i < GameHudEventQueue.Events.Count; i++) 
+		{
+	        var form = new WWWForm();
+			
+			form.AddField("gh_session_identifier", GameSessionIdentifier);
+			form.AddField("version", Version);
+			
+			form.AddField("gh_name", GameHudEventQueue.Events[i]._Name);
+			form.AddField("gh_recorded_at", GameHudEventQueue.Events[i]._RecordedAt);
+			if (GameHudEventQueue.Events[i]._StackTrace != "") form.AddField("gh_bucket", GameHudEventQueue.Events[i]._StackTrace);
+			if (GameHudEventQueue.Events[i]._Level != "") form.AddField("level", GameHudEventQueue.Events[i]._Level);
+			if (GameHudEventQueue.Events[i]._LogType != "") form.AddField("log_type", GameHudEventQueue.Events[i]._LogType);
+			
+			if (GameHudEventQueue.Events[i]._EventProperties != null)
+			{
+				foreach (var pair in GameHudEventQueue.Events[i]._EventProperties)
+				{
+					form.AddField(pair.Key, pair.Value);
+				}
+			}
+			
+			StartCoroutine(Send("events", form, GameHudEventQueue.Events[i]));
+		}
     }
 
-    IEnumerator Send(string method, WWWForm form, Action callBack) //Func<string, int>
+    IEnumerator Send(string method, WWWForm form, GameHudEvent gameHudEvent)
     {
         if (Application.internetReachability == NetworkReachability.NotReachable)
             yield break;
 
-        int tempId;
-        var url = "http://www.mygamehud.com/api/v1/";
+        var url = "http://www.mygamehud.com/api/v2/";
         url += method;
 
-        form.AddField("game_id", gameId);
-        form.AddField("game_api_key", gameApiKey);
+        form.AddField("gh_api_key", gameApiKey);
+		form.AddField("gh_device_identifier", DeviceIdentifier);
+		form.AddField("gh_submitted_at", DateTime.Now.ToString("O"));
 
         WWW www = new WWW(url, form);
         yield return www;
 
         // WWW does not react to HTTP status codes, only transport errors?
-        if (www.error != null || www.text.Substring(0, 1) == "E")
+        if (www.error != null || www.text.Substring(0, 1) != "0")
         {
             Debug.LogError(www.text + " - " + www.error);
         }
-        else if (int.TryParse(www.text, out tempId))
+        else 
         {
-            if (method == "machines")
+            //if (method == "devices") Debug.Log("GameHUD-Device Sent");
+            if (method == "events")
             {
-                MachineId = tempId;
-                PlayerPrefs.SetInt(machinePrefsKey, MachineId);
-                Debug.Log("GameHUD-MachineId: " + tempId);
-            }
-            else if (method == "game_sessions")
-            {
-                GameSessionId = tempId;
-                Debug.Log("GameHUD-GameSessionId: " + tempId);
-            }
-            else if (method == "game_events")
-            {
-                GameHudEventQueue.Events.RemoveRange(0, eventsSent);
-                Debug.Log("GameHUD-QueuedGameEventsId: " + tempId);
+                GameHudEventQueue.Events.Remove(gameHudEvent);
+                //Debug.Log("GameHUD-Events Sent");
             }
         }
-
-        if (callBack != null)
-            callBack();
     }
-
 }
 
 

@@ -1,17 +1,15 @@
 using System;
+using System.Collections.Generic;
 
 /// <summary>
 /// Struct stores the data required for each game event. 
 /// </summary>
 public struct GameHudEvent
 {
-	public int counter;
-	public string type;
-	public string message;
-	public string level;
-	public float xPosition;
-	public float yPosition;
-	public float zPosition;
-	public string call_stack;
-	public string recorded_at;
+	public string _Name;	
+	public string _RecordedAt;
+	public string _StackTrace;	
+	public string _Level;
+	public string _LogType;
+	public Dictionary<string, string> _EventProperties;
 }
