@@ -1,3 +1,5 @@
+2.1 - Updated the GAMEHudEventQueue.Log method to support sending multiple occurences of the same event.  This happens by default for Unity console logging.
+
 2.0 - Updated the wrapper to work with Version 2 of the GameHud API.
 
 1.2 - Revised how versioning works.  Major release 1.X corresponds to the API version.  Minor release X.2 refers to a wrapper improvement.

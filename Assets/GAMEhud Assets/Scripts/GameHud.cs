@@ -169,6 +169,7 @@ public class GameHud : MonoBehaviour
 			if (GameHudEventQueue.Events[i]._StackTrace != "") form.AddField("gh_bucket", GameHudEventQueue.Events[i]._StackTrace);
 			if (GameHudEventQueue.Events[i]._Level != "") form.AddField("level", GameHudEventQueue.Events[i]._Level);
 			if (GameHudEventQueue.Events[i]._LogType != "") form.AddField("log_type", GameHudEventQueue.Events[i]._LogType);
+			if (GameHudEventQueue.Events[i]._Occurences != 0) form.AddField("occurences", GameHudEventQueue.Events[i]._Occurences);
 			
 			if (GameHudEventQueue.Events[i]._EventProperties != null)
 			{
@@ -187,7 +188,7 @@ public class GameHud : MonoBehaviour
         if (Application.internetReachability == NetworkReachability.NotReachable)
             yield break;
 
-        var url = "http://www.mygamehud.com/api/v2/";
+        var url = "https://www.mygamehud.com/api/v2/";
         url += method;
 
         form.AddField("gh_api_key", gameApiKey);

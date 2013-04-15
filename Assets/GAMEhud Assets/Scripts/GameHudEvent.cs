@@ -11,5 +11,6 @@ public struct GameHudEvent
 	public string _StackTrace;	
 	public string _Level;
 	public string _LogType;
+	public int _Occurences;
 	public Dictionary<string, string> _EventProperties;
 }

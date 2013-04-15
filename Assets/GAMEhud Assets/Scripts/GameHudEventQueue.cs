@@ -47,7 +47,7 @@ public sealed class GameHudEventQueue
         if (!string.IsNullOrEmpty(message) && message.StartsWith("GameHUD"))
             return;
 
-        Log(message, logName, stackTrace, null);
+        Log(message, logName, stackTrace, 1, null);
     }
 
     /// <summary>
@@ -57,7 +57,7 @@ public sealed class GameHudEventQueue
 	/// <param name="eventProperties">Event properties dictionary </param>
     public static void Log(string name, Dictionary<string, string> eventProperties)
     {
-        Log(name, "", "", eventProperties);
+        Log(name, "", "", 0, eventProperties);
     }	
 	
     /// <summary>
@@ -66,7 +66,7 @@ public sealed class GameHudEventQueue
     /// <param name="name">The event name.</param>
     public static void Log(string name)
     {
-        Log(name, "", "", null);
+        Log(name, "", "", 0, null);
     }
 
 /// <summary>
@@ -75,12 +75,31 @@ public sealed class GameHudEventQueue
 /// <param name="name">Event Name</param>
 /// <param name="logType">Unity Log type.</param>
 /// <param name="stackTrace">Unity Stack trace.</param>
+/// <param name="occurences">Store how many times a duplicate event occured.</param>
 /// <param name="eventProperties">Event properties dictionary </param>
-    public static void Log(string name, string logType, string stackTrace, Dictionary<string, string> eventProperties)
+    public static void Log(string name, string logType, string stackTrace, int occurences, Dictionary<string, string> eventProperties)
     {
         if (Application.isEditor && !GameHud.Instance.sendUnityEditorLogs)
             return;
-
+		
+		for (int i = 0; i < Events.Count; i++) //foreach (GameHudEvent e in Events)
+		{
+	    	if (Events[i]._Occurences > 0 && Events[i]._Name == name && Events[i]._Level == Application.loadedLevelName && Events[i]._LogType == logType)
+	    	{
+				Events[i] = new GameHudEvent
+				{
+					_Name = name,
+					_RecordedAt = System.DateTime.Now.ToString("O"),
+					_StackTrace = stackTrace,
+					_Level = Application.loadedLevelName,
+					_LogType = logType,
+					_Occurences = Events[i]._Occurences + 1,
+					_EventProperties = eventProperties					
+				};
+				return;
+	    	}			
+		}
+		
         Events.Add(new GameHudEvent
         {
 			_Name = name,
@@ -88,7 +107,8 @@ public sealed class GameHudEventQueue
 			_StackTrace = stackTrace,
 			_Level = Application.loadedLevelName,
 			_LogType = logType,
+			_Occurences = occurences,
 			_EventProperties = eventProperties
-        });
+        });			
     }
 }
