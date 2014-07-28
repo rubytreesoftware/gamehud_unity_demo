@@ -164,11 +164,19 @@ public class GameHud : MonoBehaviour
 			form.AddField("gh_session_identifier", GameSessionIdentifier);
 			form.AddField("version", Version);
 			
-			form.AddField("gh_name", GameHudEventQueue.Events[i]._Name);
+			if (GameHudEventQueue.Events[i]._LogType != "")
+			{
+				form.AddField("gh_name", "Unity " + GameHudEventQueue.Events[i]._LogType);
+				form.AddField("message", GameHudEventQueue.Events[i]._Name);
+				form.AddField("log_type", GameHudEventQueue.Events[i]._LogType);
+			}
+			else
+			{
+				form.AddField("gh_name", GameHudEventQueue.Events[i]._Name);
+			}
 			form.AddField("gh_recorded_at", GameHudEventQueue.Events[i]._RecordedAt);
 			if (GameHudEventQueue.Events[i]._StackTrace != "") form.AddField("gh_bucket", GameHudEventQueue.Events[i]._StackTrace);
 			if (GameHudEventQueue.Events[i]._Level != "") form.AddField("level", GameHudEventQueue.Events[i]._Level);
-			if (GameHudEventQueue.Events[i]._LogType != "") form.AddField("log_type", GameHudEventQueue.Events[i]._LogType);
 			if (GameHudEventQueue.Events[i]._Occurences != 0) form.AddField("occurences", GameHudEventQueue.Events[i]._Occurences);
 			
 			if (GameHudEventQueue.Events[i]._EventProperties != null)

@@ -1,3 +1,5 @@
+2.2 - Unity logs, warnings and errors now record a generic name (e.g., Unity Warning) and record the log message as a property on the event.  
+
 2.1 - Updated the GAMEHudEventQueue.Log method to support sending multiple occurences of the same event.  This happens by default for Unity console logging.
 
 2.0 - Updated the wrapper to work with Version 2 of the GameHud API.
